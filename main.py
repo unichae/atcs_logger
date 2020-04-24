@@ -9,9 +9,11 @@ from time import sleep
 if __name__ == "__main__":
     # window creation 
     print("ATCS logger start")
+
+    # temp logger
     t_receiver = threading.Thread(target=ReceiveFromProxy.receiveLog)
     t_receiver.start()
-    
+
 
     # file creation time
 
