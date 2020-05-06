@@ -40,8 +40,9 @@ def print_conversation_header(pkt):
         pass
 
 
-cap = pyshark.LiveCapture(interface='Wi-Fi', bpf_filter='udp port 23232')
-# cap.set_debug()
+# cap = pyshark.LiveCapture(interface='Synergy', bpf_filter='udp port 23232')
+cap = pyshark.LiveCapture(interface='Synergy', bpf_filter='udp port 23232')
+cap.set_debug()
 # cap.sniff()
 cap.sniff(packet_count=10)
-cap.apply_on_packets(print_conversation_header, timeout=10000)
+cap.apply_on_packets(print_conversation_header, timeout=1000000)
