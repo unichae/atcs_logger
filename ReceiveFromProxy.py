@@ -59,7 +59,7 @@ def receiveLog(sock):
 
 
     # file hanlder set
-    fileName = "{:s}.log".format(datetime.now().strftime('%Y_%m_%d_atcs_log_'))
+    fileName = "{:s}.log".format(datetime.now().strftime('%Y_%m_%d_atcs_out_log_'))
     myFileHandler = handlers.TimedRotatingFileHandler(filename=fileName, when='midnight', interval=1)
     # myFileHandler = logging.FileHandler(fileName)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -67,7 +67,7 @@ def receiveLog(sock):
     myFileHandler.prefix = '%Y%m%d'
 
     # logger set
-    myLogger = logging.getLogger("atcs_file_logger")
+    myLogger = logging.getLogger("atcs_file_out_logger")
     myLogger.setLevel(logging.INFO)
     myLogger.addHandler(myFileHandler)
     myStreamHandler = logging.StreamHandler()
