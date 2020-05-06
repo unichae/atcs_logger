@@ -3,6 +3,7 @@ import struct
 from datetime import datetime
 import AtcsLogger
 import logging
+from logging import handlers
 
 
 def saveLogData(str):
@@ -46,23 +47,28 @@ def get_ip():
 
 # log server 
 # def receiveLog(fileLogger, streamLogger):
-def receiveLog():
-    myAddress = get_ip()
-    myPort = 23232
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.bind((myAddress, myPort))
+def receiveLog(sock):
+    print("receive thread start")
+    # myAddress = get_ip()
+    # myPort = 23232
+    # sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    # sock.bind((myAddress, myPort))
 
-    print("server start")
-    print("server IP: {:s} | port: {:d}".format(myAddress, myPort))
+    # print("server start")
+    # print("server IP: {:s} | port: {:d}".format(myAddress, myPort))
 
 
-    # temp file logger 
-    myLogger = logging.getLogger("atcs_file_logger")
-    myLogger.setLevel(logging.INFO)
-    fileName = "{:s}.log".format(datetime.now().strftime('%Y_%m_%d'))
-    myFileHandler = logging.FileHandler(fileName)
+    # file hanlder set
+    fileName = "{:s}.log".format(datetime.now().strftime('%Y_%m_%d_atcs_log_'))
+    myFileHandler = handlers.TimedRotatingFileHandler(filename=fileName, when='midnight', interval=1)
+    # myFileHandler = logging.FileHandler(fileName)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     myFileHandler.setFormatter(formatter)
+    myFileHandler.prefix = '%Y%m%d'
+
+    # logger set
+    myLogger = logging.getLogger("atcs_file_logger")
+    myLogger.setLevel(logging.INFO)
     myLogger.addHandler(myFileHandler)
     myStreamHandler = logging.StreamHandler()
     myStreamHandler.setFormatter(formatter)
@@ -71,16 +77,15 @@ def receiveLog():
 
     # send register packet id: 0x9900
     # data = [0xFE, 0x00, 0x00, 0x02, 0x00, 0x00, 0x99, 0x12, 0x34, 0x56, 0x78]
-    proxyAddress = '118.219.52.84'
-    proxyPort = 6900
-    data = "\xfe\x00\x00\x02\x00\x00\x99\x12\x34\x56\x78"
-    sock.sendto(bytes(data, "utf-8"), (proxyAddress, proxyPort))
+    # proxyAddress = '118.219.52.84'
+    # proxyPort = 6900
+    # data = "\xfe\x00\x00\x02\x00\x00\x98\x12\x34\x56\x78"
+    # sock.sendto(bytes(data, "utf-8"), (proxyAddress, proxyPort))
 
     while True:
-
+        data = ''
         data, info = sock.recvfrom(512)
         str = saveLogData(data)
         myLogger.info(str)
-        
         # printLogData(str)
 
