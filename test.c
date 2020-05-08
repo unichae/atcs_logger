@@ -1,3 +1,10 @@
+/*
+	created by Chae
+	sniffing 
+	forwarding
+	monitoring 
+*/
+
 #include <stdio.h>	//For standard things
 #include <stdlib.h>	//malloc
 #include <string.h>	//memset
@@ -8,17 +15,23 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 
-void ProcessPacket(unsigned char* , int);
-void print_ip_header(unsigned char* , int);
-void print_tcp_packet(unsigned char* , int);
+//  create two threads
+// sniffing thread
+// forwarding thread
+
+void process_packet(unsigned char * , int);
+void print_ip_header(unsigned char * , int);
+void print_tcp_packet(unsigned char * , int);
 void print_udp_packet(unsigned char * , int);
-void print_icmp_packet(unsigned char* , int);
-void PrintData (unsigned char* , int);
+void print_icmp_packet(unsigned char * , int);
+void print_data(unsigned char * , int);
+void forward_udp_packet(unsigned char *buffer , int size);
 
 int sock_raw;
 FILE *logfile;
 int tcp=0,udp=0,icmp=0,others=0,igmp=0,total=0,i,j;
 struct sockaddr_in source,dest;
+mHost = "192.168.0.99";
 
 int main()
 {
@@ -49,14 +62,14 @@ int main()
 			return 1;
 		}
 		//Now process the packet
-		ProcessPacket(buffer , data_size);
+		process_packet(buffer , data_size);
 	}
 	close(sock_raw);
 	printf("Finished");
 	return 0;
 }
 
-void ProcessPacket(unsigned char* buffer, int size)
+void process_packet(unsigned char* buffer, int size)
 {
 	//Get the IP Header part of this packet
 	struct iphdr *iph = (struct iphdr*)buffer;
@@ -74,12 +87,15 @@ void ProcessPacket(unsigned char* buffer, int size)
 		
 		case 6:  //TCP Protocol
 			++tcp;
-			print_tcp_packet(buffer , size);
+			// print_tcp_packet(buffer , size);
 			break;
 		
 		case 17: //UDP Protocol
 			++udp;
 			print_udp_packet(buffer , size);
+			forward_udp_packet(buffer , size);
+			// forwarding to monitoring device?
+			
 			break;
 		
 		default: //Some Other Protocol like ARP etc.
@@ -199,6 +215,12 @@ void print_udp_packet(unsigned char *Buffer , int Size)
 	fprintf(logfile,"\n###########################################################");
 }
 
+//  added by Chae
+void forward_udp_packet(unsigned char *buffer , int size)
+{
+	printf("do something\n");
+}
+
 void print_icmp_packet(unsigned char* Buffer , int Size)
 {
 	unsigned short iphdrlen;
@@ -239,7 +261,7 @@ void print_icmp_packet(unsigned char* Buffer , int Size)
 	fprintf(logfile,"\n###########################################################");
 }
 
-void PrintData (unsigned char* data , int Size)
+void print_data(unsigned char* data , int Size)
 {
 	
 	for(i=0 ; i < Size ; i++)
